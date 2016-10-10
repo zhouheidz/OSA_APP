@@ -1,0 +1,30 @@
+
+<head>
+    <title>Login</title>
+	<link rel="stylesheet" href="/css/bootstrap.css" />
+	<link rel="stylesheet" href="/css/style.css" />
+</head>
+
+
+
+<div class="container">
+
+	<div class="col-sm-6 col-sm-offset-3">
+		<h2><span class="fa fa-anchor"><center>L O G I N</center></span></h2>
+		<form action="/web" method="post">
+	        <div class="form-group">
+    			<label for="inputEmail" class="sr-only">Email address</label>
+	            <input type="email" class="form-control" name="up_mail" placeholder="Email address" required autofocus>
+	        </div>
+	        <div class="form-group">
+    			<label for="inputPassword" class="sr-only">Password</label>
+	            <input type="password" class="form-control" name="pass" placeholder="Password" required>
+	        </div>
+
+   			 <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+	    </form>
+	</div>
+</div>
+
+
+
