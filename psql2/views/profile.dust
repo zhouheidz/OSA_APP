@@ -50,7 +50,148 @@
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
           <h1 class="page-header">Home</h1>
+            <div>
+              <!-- insert posts here -->
+              <!-- <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="formModal">Add Post</button> -->
 
+              <form method="post" action="/announce">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <h4 class="modal-title" id="myModalLabel">Add Post</h4>
+                </div>
+                <div class="modal-body">
+                  <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" class="form-control" name="title"/>
+                  </div>
+                  <div class="form-group">
+                    <label>Type</label>
+                    <input type="text" class="form-control" name="type"/>
+                  </div>
+                  <!-- <div class="form-group">
+                      <label>Posted by:</label>
+                      <input type="text" class="form-control" name="huchiu@up.edu.ph"/>
+                  </div> -->
+                  <div class="form-group">
+                    <label>Description</label>
+                    <textarea class="form-control" name="description"></textarea>
+                  </div>
+                  <input type="checkbox" name="specifiRecipient" value="Specific Recipient">
+                </div>
+                  <div class="modal-footer">
+                   <!--  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> -->
+                    <input type="submit" class="btn btn-primary" value="Post" />
+                  </div>
+              </form>
+
+
+              {#posts}
+                <div class="well">
+                  <h4>{title} 
+                  <!-- ang ibutang nimo sa naay hashtag kay tablename_{id}-->
+                  <!-- <button class="btn btn-default pull-right" data-toggle="collapse" href="#posts_{timestamp}" aria-expanded="false" aria-controls="posts_{timestamp}">
+                    <span class="glyphicon glyphicon-triangle-bottom" aria-hidden="true"></span>
+                  </button> --></h4>
+                    <!-- <div class="collapse" id="posts_{timestamp}"> -->
+                      <br />
+                      <br />
+                      <!-- kanang naa sa braces kay mga column names-->
+                      <p><strong>Description: </strong>{description}</p>
+                      <p><strong>Author: </strong>{up_mail}</p>
+                      <p><strong>Timestamp: </strong>{timestamp}</p>
+                      <br />
+                      <hr />
+
+                      <!-- <button class="btn btn-default edit-post"
+                      data-toggle="modal" data-target="#editFormModal"
+                      data-timestamp="{timestamp}" data-title="{title}" 
+                      data-author="{up_mail}" data-description="{description}">
+                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                      </button>
+
+                      <button class="btn btn-danger delete-book" data-isbn="{isbn}">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                      </button> -->
+                    <!-- </div> -->
+                </div>
+              {/posts}
+
+
+              <!-- Add Form Modal -->
+              <!-- <div class="modal fade" id="formModal" tabindex="-1" role="dialog" aria-labelledby="formModalLabel">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <form method="post" action="/announce">
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                          <h4 class="modal-title" id="myModalLabel">Add Post</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                              <label>Title</label>
+                              <input type="text" class="form-control" name="title"/>
+                            </div>
+                            <div class="form-group">
+                              <label>Type</label>
+                              <input type="text" class="form-control" name="type"/>
+                            </div>
+                            <div class="form-group">
+                              <label>Posted by:</label>
+                              <input type="text" class="form-control" name="huchiu@up.edu.ph"/>
+                            </div>
+                            <div class="form-group">
+                              <label>Description</label>
+                              <textarea class="form-control" name="description"></textarea>
+                            </div>
+                        </div>
+                        <input type="checkbox" name="specifiRecipient" value="Specific Recipient">
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                          <input type="submit" class="btn btn-primary" value="Save" />
+                        </div>
+                    </form>
+                  </div>
+                </div>
+              </div> -->
+
+              <!-- Edit Form Modal -->
+              <div class="modal fade" id="editFormModal" tabindex="-1" role="dialog" aria-labelledby="editFormModalLabel">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <form method="post" action="/edit">
+                      <input type="hidden" id="edit-form-isbn" name="isbn"/>
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                          <h4 class="modal-title" id="myModalLabel">Edit Book</h4>
+                        </div>
+                        <div class="modal-body"><!-- 
+                            <div class="form-group">
+                              <label>ISBN</label>
+                              <input type="text" class="form-control" name="isbn" id="edit-form-isbn"/>
+                            </div> -->
+                            <div class="form-group">
+                              <label>Title</label>
+                              <input type="text" class="form-control" name="title" id="edit-form-title"/>
+                            </div>
+                            <div class="form-group">
+                              <label>Author</label>
+                              <input type="text" class="form-control" name="author" id="edit-form-author"/>
+                            </div>
+                            <div class="form-group">
+                              <label>Description</label>
+                              <textarea class="form-control" name="description" id="edit-form-description"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                          <input type="submit" class="btn btn-primary" value="Save" />
+                        </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+            </div>
           </div>
         </div>
       </div>
@@ -59,12 +200,13 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
+   <!--  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
-    <script src="../../dist/js/bootstrap.min.js"></script>
+    <script src="../../dist/js/bootstrap.min.js"></script> -->
     <!-- Just to make our placeholder images work. Don't actually copy the next line! -->
-    <script src="../../assets/js/vendor/holder.min.js"></script>
+    <!-- <script src="../../assets/js/vendor/holder.min.js"></script> -->
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
+    <!-- <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script> -->
 </body>
 </html>
