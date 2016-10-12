@@ -1,0 +1,60 @@
+  drop table job_hiring;
+  drop table posts
+  drop type p_type;
+  create type p_type as enum('Events', 'Job Hiring', 'Announcement', 'Notification', 'Org Post');
+  create table posts(
+  up_mail varchar(40),
+  timestamp timestamp default current_timestamp,
+  post p_type not null,
+  title varchar(40) not null,
+  description text not null,
+  primary key(timestamp),
+  foreign key(up_mail) references
+  users(up_mail)
+  on update cascade
+  on delete cascade
+  );
+  create table announcement(
+  announcement_id timestamp,
+  recepient varchar(40),
+  primary key(announcement_id),
+  foreign key(announcement_id) references
+  posts(timestamp)
+  on update cascade
+  on delete cascade
+  );
+  create table org_post(
+  orgpost_id timestamp,
+  recepient varchar(40),
+  org_name varchar(40),
+  primary key(orgpost_id),
+  foreign key(orgpost_id) references
+  posts(timestamp)
+  on update cascade
+  on delete cascade,
+  foreign key(org_name) references
+  organization(organization_name)
+  on update cascade
+  on delete cascade
+  );
+  create table events(
+  event_id timestamp,
+  event_type e_type not null,
+  primary key(event_id),
+  foreign key(event_id) references
+  posts(timestamp)
+  on update cascade
+  on delete cascade
+  );
+  create table job_hiring(
+  job_id timestamp,
+  preferences varchar(50) not null,
+  requirements text not null,
+  details text not null,
+  primary key(job_id),
+  foreign key(job_id) references
+  posts(timestamp)
+  on update cascade
+  on delete cascade
+  );
+ 

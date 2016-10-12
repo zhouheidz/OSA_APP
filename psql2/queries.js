@@ -12,8 +12,10 @@ var express = require('express');
 var app = express();
 var pg = require('pg');
 var client = new pg.Client(connectionString);
+var latest;
+var AnnounecementTimestamp;
+var recepient;
 client.connect();
-var username = 'huchiu@up.edu.ph';
 
 
 //functions for mobile
@@ -102,29 +104,77 @@ function post(req, res) {
 
 function prof(req, res) {
   console.log('enter profile');
+  
   client.query('SELECT * FROM posts ORDER BY timestamp DESC', function(err, result) {
       if(err) {
         return console.error('naay error', err);
       }
-      console.log({posts: result.rows});
-      res.render('profile', {posts: result.rows});
+      //console.log({posts: result.rows});
+      //latest = result.rows[0].timestamp;
+      //console.log("latest timestamp is " + latest);
+      client.query('SELECT organization_name FROM organization', function(err, result2) {
+        if(err) {
+          return console.error('naay error', err);
+        }
+        //console.log({posts: result.rows, organization:result2.rows});
+        res.render('profile', {posts: result.rows, organization:result2.rows});
+      });
+      
    });
 };
 
 function announce(req, res) {
   //console.log('poster is ' + user.up_mail);
-  console.log('trying to add');
-  console.log(username);
+
+  console.log('INSIDE Announcement');
   console.log(req.body.type);
   console.log(req.body.title);
   console.log(req.body.description);
+  recepient = req.body.recepient;
   //res.send(username + " has posted " + req.body.title);
-   client.query('INSERT INTO posts(up_mail, post, title, description) VALUES($1, $2, $3, $4)', [username, req.body.type, req.body.title, req.body.description]);
-   prof(req, res);
+  client.query('SELECT organization_name FROM organization WHERE organization_name = $1', [req.body.organization], function(err, result) {
+    if(err) {
+      return console.error('naay error', err);
+    }
+    console.log("BEFORE INSERT");
+    client.query('SELECT * FROM posts ORDER BY timestamp DESC', function(err, result) {
+      if(err) {
+        return console.error('naay error', err);
+      }
+      //console.log({posts: result.rows});
+      if(typeof recepient == 'undefined') {
+        recepient = 'Public';
+      }
+    client.query('INSERT INTO posts(up_mail, post, title, description) VALUES($1, $2, $3, $4)', ['huchiu@up.edu.ph', 'Announcement', req.body.title, req.body.description]);
+    client.query('SELECT timestamp FROM posts ORDER BY timestamp DESC', function(err, result) {
+      AnnounecementTimestamp = result.rows[0].timestamp;
+      console.log("AFTER INSERT LATEST TIMESTAMP IS: "+AnnounecementTimestamp);
+      console.log('recepient is: '+recepient);
+      client.query('INSERT INTO announcement(announcement_id,recepient) VALUES($1,$2)', [AnnounecementTimestamp,recepient]);
+     });
+    
+    //console.log("AFTER INSERT PREVIOUS TIMESTAMP WAS:"+latest);
+    
+    });
+    
+  });
+
+   
+   // client.query('SELECT * FROM posts ORDER BY timestamp DESC', function(err, result) {
+   //    if(err) {
+   //      return console.error('naay error', err);
+   //    }
+   //    console.log({posts: result.rows[0]});
+   //    client.query('INSERT INTO announcement(announcement_id, recepient) VALUES($1, $2)', [result.rows[0].timestamp, ]);
+   //    //res.render('profile', {posts: result.rows});
+   // });
+   res.redirect('prof');
 };
 
 function announcements(req, res) {
-  res.render('profile', {posts: result.rows});
+  
+  res.render('profile', {posts: result.rows, organization:result2.rows});
+  
 }
 
 
