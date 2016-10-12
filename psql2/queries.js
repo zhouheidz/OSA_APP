@@ -6,12 +6,14 @@ var options = {
 };
 
 var pgp = require('pg-promise')(options);
-var connectionString = 'postgres://postgres:eragon1@localhost:5432/osaapp';
+var connectionString = 'postgres://postgres:p@ssw0rd@localhost/osaapp';
 var db = pgp(connectionString);
 var express = require('express');
 var app = express();
 var pg = require('pg');
-
+var client = new pg.Client(connectionString);
+client.connect();
+var username = 'huchiu@up.edu.ph';
 
 
 //functions for mobile
@@ -55,10 +57,7 @@ function User(){
 
 User.findOne = function(req, callback){
     var isNotAvailable = false; 
-    var conString = "postgres://postgres:eragon1@localhost/osaapp";
-    var client = new pg.Client(conString);
     console.log(req.up_mail + ' is in the findOne function test');
-    client.connect();
     client.query('SELECT * from users WHERE up_mail= $1 AND pass=$2', [req.up_mail, req.pass], function(err, result){
         console.log(result.rows);
         if(err){
@@ -73,13 +72,14 @@ User.findOne = function(req, callback){
             isNotAvailable = false;
             console.log(req.up_mail + ' is available');
         }
-        client.end();
+        //client.end();
         return callback(false, isNotAvailable, this);
     });
 };
 
 function get(req, res) {
   console.log('entered');
+  console.log("Cookies: ", req.cookies);
   res.render('index');
 }
 
@@ -102,8 +102,30 @@ function post(req, res) {
 
 function prof(req, res) {
   console.log('enter profile');
-  res.render('profile');
+  client.query('SELECT * FROM posts ORDER BY timestamp DESC', function(err, result) {
+      if(err) {
+        return console.error('naay error', err);
+      }
+      console.log({posts: result.rows});
+      res.render('profile', {posts: result.rows});
+   });
 };
+
+function announce(req, res) {
+  //console.log('poster is ' + user.up_mail);
+  console.log('trying to add');
+  console.log(username);
+  console.log(req.body.type);
+  console.log(req.body.title);
+  console.log(req.body.description);
+  //res.send(username + " has posted " + req.body.title);
+   client.query('INSERT INTO posts(up_mail, post, title, description) VALUES($1, $2, $3, $4)', [username, req.body.type, req.body.title, req.body.description]);
+   prof(req, res);
+};
+
+function announcements(req, res) {
+  res.render('profile', {posts: result.rows});
+}
 
 
 module.exports = {
@@ -111,7 +133,9 @@ module.exports = {
   get: get,
   post: post,
   prof: prof,
-  tryPost: tryPost
+  tryPost: tryPost,
+  announce: announce,
+  announcements:announcements
   // getUsers2: getUsers2
   // getWeb: getWeb
 };

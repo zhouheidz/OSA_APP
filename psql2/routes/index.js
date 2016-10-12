@@ -17,6 +17,7 @@ router.post('/try', db.tryPost);
 router.get('/web', db.get);
 router.post('/web', db.post);
 router.get('/prof', db.prof);
-
+router.post('/announce', db.announce);
+router.get('/announce', db.announcements);
 
 module.exports = router;
