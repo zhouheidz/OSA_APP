@@ -15,28 +15,70 @@ var client = new pg.Client(connectionString);
 var latest;
 var AnnounecementTimestamp;
 var recepient;
+var up_mail;
 client.connect();
 
 
-//functions for mobile
-function getUsers(req, res, next) {
-db.any('select * from users')
-  .then(function (data) {
-    res.end(JSON.stringify(data));
 
+
+//functions for mobile
+function getAllUsers(req, res, next) {
+  db.any('select * from users')
+    .then(function (data) {
+      res.status(200)
+        .json({
+          status: 'success',
+          data: data,
+          message: 'Retrieved users'
+        });
+    })
+    .catch(function (err) {
+      return res.status(200).json ({
+        statis: 'error'
+      })
+    });
+}
+
+function getOneUser(req, res, next) {
+  db.one('select * from users where up_mail = $1', req.params.up_mail)
+  .then(function (data) {
+    res.status(200)
+      .json({
+        status: 'success',
+        data: data,
+        message: 'Retrieved ONE user'
+      });
   })
   .catch(function (err) {
     return next(err);
   });
 }
 
-function tryPost (req, res) {
-  var user_id = req.param('id');
-  var token = req.param('token');
-  var geo = req.param('geo'); 
-
-  res.send(user_id + ' ' + token + ' ' + geo); 
+function postDetails (req, res, next) {
+  var mail = req.body.up_mail;
+  var password = req.body.password;
+  response = {
+   up_mail:req.body.up_mail,
+   pass:req.body.password
+  };
+  console.log(mail, password);
+  db.one('select * from users where up_mail = $1 and pass = $2', [mail, password])
+  .then(function (data) {
+    res.status(200)
+      .json({
+        status: 'success',
+        data: data,
+        message: 'Retrieved ONE user'
+      });
+  })
+  .catch(function (err) {
+    return res.status(200).json ({
+      status: 'error'
+    })
+  });
 }
+
+
 
 
 
@@ -68,6 +110,7 @@ User.findOne = function(req, callback){
         }
         if (result.rows.length > 0){
             isNotAvailable = true; // update the user for return in callback
+
             console.log(req.up_mail + ' is not available!');
         }
         else{
@@ -88,12 +131,13 @@ function get(req, res) {
 
 function post(req, res) {
   console.log(req.body.up_mail + " " + req.body.pass);
+  up_mail = req.body.up_mail;
   User.findOne({up_mail: req.body.up_mail, pass: req.body.pass}, function(err, user) {
     if(!user) {
       res.render('index', { error: "Incorrect email/password."});
     } else {
       if(req.body.password == user.password) {
-        res.redirect('/prof');
+        res.redirect('prof');
       } else {
         res.render('index', { error: "Incorrect email/password."});
       }
@@ -124,8 +168,6 @@ function prof(req, res) {
 };
 
 function announce(req, res) {
-  //console.log('poster is ' + user.up_mail);
-
   console.log('INSIDE Announcement');
   console.log(req.body.type);
   console.log(req.body.title);
@@ -144,48 +186,71 @@ function announce(req, res) {
       //console.log({posts: result.rows});
       if(typeof recepient == 'undefined') {
         recepient = 'Public';
+        client.query('INSERT INTO posts(up_mail, post, title, description) VALUES($1, $2, $3, $4)', [up_mail, 'Announcement', req.body.title, req.body.description]);
+        client.query('SELECT timestamp FROM posts ORDER BY timestamp DESC', function(err, result) {
+          AnnounecementTimestamp = result.rows[0].timestamp;
+          console.log("AFTER INSERT LATEST TIMESTAMP IS: "+AnnounecementTimestamp);
+          console.log('recepient is: '+recepient);
+          client.query('INSERT INTO announcement(announcement_id,recepient) VALUES($1,$2)', [AnnounecementTimestamp,recepient]);
+         });
       }
-    client.query('INSERT INTO posts(up_mail, post, title, description) VALUES($1, $2, $3, $4)', ['huchiu@up.edu.ph', 'Announcement', req.body.title, req.body.description]);
-    client.query('SELECT timestamp FROM posts ORDER BY timestamp DESC', function(err, result) {
-      AnnounecementTimestamp = result.rows[0].timestamp;
-      console.log("AFTER INSERT LATEST TIMESTAMP IS: "+AnnounecementTimestamp);
-      console.log('recepient is: '+recepient);
-      client.query('INSERT INTO announcement(announcement_id,recepient) VALUES($1,$2)', [AnnounecementTimestamp,recepient]);
-     });
-    
-    //console.log("AFTER INSERT PREVIOUS TIMESTAMP WAS:"+latest);
-    
+      client.query('SELECT organization_name from organization WHERE organization_name = $1', [recepient], function(err, result) {
+        //console.log("org is " + result.rows[0].organization_name);
+        if(result.rows.length > 0) {
+          client.query('INSERT INTO posts(up_mail, post, title, description) VALUES($1, $2, $3, $4)', [up_mail, 'Announcement', req.body.title, req.body.description]);
+          client.query('SELECT timestamp FROM posts ORDER BY timestamp DESC', function(err, result) {
+            AnnounecementTimestamp = result.rows[0].timestamp;
+            console.log("AFTER INSERT LATEST TIMESTAMP IS: "+AnnounecementTimestamp);
+            console.log('recepient is: '+recepient);
+            client.query('INSERT INTO announcement(announcement_id,recepient) VALUES($1,$2)', [AnnounecementTimestamp,recepient]);
+           });
+        } else {
+          console.log("org name does not exist");
+          res.render('announce', { error: "Invalid organization"});
+        }
+      });
+          
     });
-    
   });
-
-   
-   // client.query('SELECT * FROM posts ORDER BY timestamp DESC', function(err, result) {
-   //    if(err) {
-   //      return console.error('naay error', err);
-   //    }
-   //    console.log({posts: result.rows[0]});
-   //    client.query('INSERT INTO announcement(announcement_id, recepient) VALUES($1, $2)', [result.rows[0].timestamp, ]);
-   //    //res.render('profile', {posts: result.rows});
-   // });
    res.redirect('prof');
 };
 
-function announcements(req, res) {
-  
-  res.render('profile', {posts: result.rows, organization:result2.rows});
-  
+function announce2(req, res) {
+    console.log('entering index');
+    res.render('announce');
+};
+
+
+// function announcements(req, res) { 
+//   res.render('viewAnnounce', {posts: result.rows, organization:result2.rows});
+// }
+
+function announcements(req, res) { 
+  res.render('viewAnnounce', {posts: result.rows, organization:result2.rows, up_mail});
 }
+
+function announcements(req, res){
+  client.query('SELECT * FROM posts ORDER BY timestamp DESC', function(err, result) {
+    if(err) {
+        return console.error('error running query', err);
+    }
+    res.render('viewAnnounce', {posts: result.rows, up_mail});
+  });
+};
+
 
 
 module.exports = {
-  getUsers: getUsers,
+  //mobile
+  getAllUsers: getAllUsers,
+  getOneUser: getOneUser,
+  postDetails: postDetails,
+
+  //web
   get: get,
   post: post,
   prof: prof,
-  tryPost: tryPost,
+  announce2: announce2,
   announce: announce,
   announcements:announcements
-  // getUsers2: getUsers2
-  // getWeb: getWeb
 };
