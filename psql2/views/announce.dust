@@ -158,6 +158,18 @@
                                     <input type="checkbox" id="checkBox" defaultChecked="false" onclick="enableDisable(this.checked, 'recepient')">
                                       <label class="col-sm-2 control-label">Specific Organizations</label>
                                       <input type="text" id="recepient" name = "recepient" disabled="disabled">
+
+                                      <!-- dropdown menu -->
+                                      <div class="dropdown">
+                                        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Recepient Org
+                                        <span class="caret"></span></button>
+                                        <ul class="dropdown-menu">
+                                          {#orgs}
+                                            <li><a href = "#">{organization_name}</a></li>
+                                          {/orgs}
+                                        </ul>
+                                      </div>
+
                                       <script language="javascript">
                                         function enableDisable(bEnable, recepient){
                                              document.getElementById(recepient).disabled = !bEnable

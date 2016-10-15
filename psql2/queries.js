@@ -217,7 +217,20 @@ function announce(req, res) {
 
 function announce2(req, res) {
     console.log('entering index');
-    res.render('announce');
+
+    //populate array with organization names
+    client.query('SELECT organization_name FROM organization', function(err, result) {
+      if(err) {
+        return console.error('i think the database is empty', err);
+      }
+      // for(i = 0; i < result.rows.length; i++) {
+      //   orgs.push(result.rows[i].organization_name);
+      //   console.log(orgs[i]);
+      // }
+      res.render('announce', {orgs:result.rows});
+    });
+
+    
 };
 
 
