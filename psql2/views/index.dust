@@ -1,30 +1,22 @@
 
 <head>
     <title>Login</title>
-	<link rel="stylesheet" href="/css/bootstrap.css" />
-	<link rel="stylesheet" href="/css/style.css" />
+	<link rel="stylesheet" href="/css/bootstrap1.css" />
+	<link rel="stylesheet" href="/css/style1.css" />
 </head>
 
-
-
-<div class="container">
-
-	<div class="col-sm-6 col-sm-offset-3">
-		<h2><span class="fa fa-anchor"><center>L O G I N</center></span></h2>
-		<form action="/web" method="post">
-	        <div class="form-group">
-    			<label for="inputEmail" class="sr-only">Email address</label>
-	            <input type="email" class="form-control" name="up_mail" placeholder="Email address" required autofocus>
-	        </div>
-	        <div class="form-group">
-    			<label for="inputPassword" class="sr-only">Password</label>
-	            <input type="password" class="form-control" name="pass" placeholder="Password" required>
-	        </div>
-
-   			 <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-	    </form>
-	</div>
+<div class="login-form">
+   <h1>L O G  -  I N</h1>
+	<form action="/web" method="post">
+	<div class="form-group ">
+        <input class="form-control" placeholder="Email Address" name="up_mail" type="email" autofocus>
+       <i class="fa fa-user"></i>
+     </div>
+	<div class="form-group log-status">     
+        <input class="form-control" placeholder="Password" name="pass" type="password" value=""> 
+  	<i class="fa fa-lock"></i>     
 </div>
-
-
-
+<button class="log-btn" type="submit">Sign in</button>
+</form>
+        
+   
